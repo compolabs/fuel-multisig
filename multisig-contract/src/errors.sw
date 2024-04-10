@@ -20,8 +20,8 @@ pub enum MultisigError {
     ThresholdCannotBeGreaterThanOwners: (),
     /// The threshold has not been reached
     ThresholdNotReached: (),
-    /// Threshold still reachable
-    ThresholdStillReachable: (),
+    /// The transaction is still valid
+    TransactionStillValid: (),
     /// The account has already voted
     AlreadyVoted: (),
     /// Transaction ID does not exist
@@ -38,4 +38,6 @@ pub enum MultisigError {
     CanOnlyCallContracts: (),
     /// Transfer requires a value to be sent
     TransferRequiresAValue: (),
+    /// The transaction has expired
+    TransactionExpired: (),
 }

@@ -8,13 +8,14 @@ pub type TxId = u64; //TODO: change this to u256. Using u256 raises the error "T
 pub type Approvals = u8;
 pub type Rejections = u8;
 
-const MAX_OWNERS: u8 = 10;
-const MAX_TRANSACTIONS: u8 = 10;
+pub const MAX_OWNERS: u8 = 10;
+pub const MAX_TRANSACTIONS: u8 = 10;
 
 /// The transaction that is being proposed.
 pub struct Transaction {
     tx_id: TxId,
     to: Identity,
+    valid_until: u64,
     tx_parameters: InternalTransactionParameters,
 }
 

@@ -6,7 +6,7 @@ abi Multisig {
     #[storage(read, write)]
     fn constructor(threshold: u8, owners_list: Vec<Identity>);
     #[storage(read, write)]
-    fn propose_tx(to:Identity, tx_parameters: TransactionParameters) -> TxId;
+    fn propose_tx(to:Identity, tx_validity_duration: u64, tx_parameters: TransactionParameters) -> TxId;
     #[storage(read, write)]
     fn approve_tx(tx_id: TxId);
     #[storage(read, write)]

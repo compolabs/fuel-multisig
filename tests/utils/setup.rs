@@ -1,27 +1,12 @@
+use super::abi::*;
+use super::constants::{DEFAULT_FORWARDED_GAS, DEFAULT_TRANSFER_AMOUNT};
 use fuels::{
     accounts::wallet::WalletUnlocked,
     core::codec::{calldata, fn_selector},
-    prelude::{
-        abigen, Address, AssetId, Contract, Error, LoadConfiguration, TxPolicies, BASE_ASSET_ID,
-    },
+    prelude::{Address, AssetId, Contract, Error, LoadConfiguration, TxPolicies, BASE_ASSET_ID},
     test_helpers::{launch_custom_provider_and_get_wallets, WalletsConfig},
     types::{bech32::Bech32ContractId, Bytes, Identity},
 };
-
-// Load abi from json
-abigen!(
-    Contract(
-        name = "Multisig",
-        abi = "./multisig-contract/out/debug/fuel-multisig-abi.json"
-    ),
-    Contract(
-        name = "Counter",
-        abi = "tests/utils/test-contracts/counter/out/debug/counter-abi.json"
-    )
-);
-
-pub const DEFAULT_TRANSFER_AMOUNT: u64 = 200;
-pub(crate) const DEFAULT_FORWARDED_GAS: u64 = 10_000_000;
 
 pub struct MultisigCaller {
     pub contract: Multisig<WalletUnlocked>,
@@ -32,7 +17,6 @@ pub struct CounterCaller {
     pub contract: Counter<WalletUnlocked>,
     pub wallet: WalletUnlocked,
 }
-
 pub fn base_asset_contract_id() -> AssetId {
     AssetId::new(BASE_ASSET_ID.into())
 }
@@ -55,6 +39,45 @@ pub fn call_parameters() -> TransactionParameters {
         forwarded_gas: DEFAULT_FORWARDED_GAS,
         function_selector: Bytes(fn_selector!(increment_counter(u64))),
         single_value_type_arg: true,
+        transfer_params: TransferParams {
+            asset_id: base_asset_contract_id(),
+            value: None,
+        },
+    })
+}
+
+pub fn call_parameters_change_threshold(threshold: u8) -> TransactionParameters {
+    TransactionParameters::Call(ContractCallParams {
+        calldata: Bytes(calldata!(threshold).unwrap()),
+        forwarded_gas: DEFAULT_FORWARDED_GAS,
+        function_selector: Bytes(fn_selector!(change_threshold(u8))),
+        single_value_type_arg: true,
+        transfer_params: TransferParams {
+            asset_id: base_asset_contract_id(),
+            value: None,
+        },
+    })
+}
+
+pub fn call_parameters_add_owner(owner: Identity) -> TransactionParameters {
+    TransactionParameters::Call(ContractCallParams {
+        calldata: Bytes(calldata!(owner).unwrap()),
+        forwarded_gas: DEFAULT_FORWARDED_GAS,
+        function_selector: Bytes(fn_selector!(add_owner(Identity))),
+        single_value_type_arg: false,
+        transfer_params: TransferParams {
+            asset_id: base_asset_contract_id(),
+            value: None,
+        },
+    })
+}
+
+pub fn call_parameters_remove_owner(owner: Identity) -> TransactionParameters {
+    TransactionParameters::Call(ContractCallParams {
+        calldata: Bytes(calldata!(owner).unwrap()),
+        forwarded_gas: DEFAULT_FORWARDED_GAS,
+        function_selector: Bytes(fn_selector!(remove_owner(Identity))),
+        single_value_type_arg: false,
         transfer_params: TransferParams {
             asset_id: base_asset_contract_id(),
             value: None,
@@ -88,7 +111,7 @@ pub async fn deploy_multisig(
 ) -> Result<(Bech32ContractId, MultisigCaller), Error> {
     // Deploy the contract
     let multisig_contract_id = Contract::load_from(
-        "./multisig-contract/out/debug/fuel-multisig.bin",
+        "../multisig-contract/out/debug/fuel-multisig.bin",
         LoadConfiguration::default(),
     )
     .unwrap()
@@ -110,7 +133,7 @@ pub async fn deploy_counter(
 ) -> Result<(Bech32ContractId, CounterCaller), Error> {
     // Deploy the contract
     let counter_contract_id = Contract::load_from(
-        "tests/utils/test-contracts/counter/out/debug/counter.bin",
+        "./utils/test-contracts/counter/out/debug/counter.bin",
         LoadConfiguration::default(),
     )
     .unwrap()
@@ -125,4 +148,14 @@ pub async fn deploy_counter(
     };
 
     Ok((counter_contract_id, deployer))
+}
+
+pub fn get_multisig_caller(
+    contract_id: &Bech32ContractId,
+    wallet: WalletUnlocked,
+) -> MultisigCaller {
+    MultisigCaller {
+        contract: Multisig::new(contract_id, wallet.clone()),
+        wallet,
+    }
 }
