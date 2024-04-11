@@ -21,6 +21,9 @@ abi Multisig {
     fn remove_owner(owner: Identity);
     #[storage(read, write)]
     fn change_threshold(threshold: u8);
+}
+
+abi Info {
     #[storage(read)]
     fn get_owners() -> Vec<Identity>;
     #[storage(read)]
@@ -37,7 +40,7 @@ abi Multisig {
     fn get_tx_calldata(tx_id: TxId) -> Option<Bytes>;
     #[storage(read)]
     fn get_tx_function_selector(tx_id: TxId) -> Option<Bytes>;
-     #[storage(read)]
+    #[storage(read)]
     fn get_tx_approval_by_owner(tx_id: TxId, owner: Identity) -> Option<bool>;
     #[storage(read)]
     fn get_tx_approval_count(tx_id: TxId) -> Option<Approvals>;

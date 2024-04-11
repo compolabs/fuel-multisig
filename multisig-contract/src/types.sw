@@ -4,7 +4,7 @@ use std::storage::storage_bytes::*;
 use std::bytes::Bytes;
 use std::asset_id::AssetId;
 
-pub type TxId = u64; //TODO: change this to u256. Using u256 raises the error "The trait `Hash` is not implemented for `u256`"
+pub type TxId = u256;
 pub type Approvals = u8;
 pub type Rejections = u8;
 

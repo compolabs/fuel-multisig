@@ -6,7 +6,7 @@ mod interface;
 mod errors;
 
 use types::{MAX_OWNERS, *};
-use interface::Multisig;
+use interface::*;
 use errors::MultisigError;
 use events::*;
 use std::{
@@ -380,7 +380,9 @@ impl Multisig for Contract {
             new_threshold: threshold,
         });
     }
+}
 
+impl Info for Contract{
     #[storage(read)]
     fn get_threshold() -> u8 {
         storage.threshold.read()
