@@ -64,7 +64,7 @@ async fn deploy_contract() {
 
 #[tokio::test]
 async fn propose_call_tx() {
-    let mut wallets = get_wallets(3).await;
+    let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let threshold = 1;
 

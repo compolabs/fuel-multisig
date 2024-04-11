@@ -449,18 +449,18 @@ fn _remove_tx(tx_id: TxId) {
     let mut i = 0;
     while i < tx_ids_list.len() {
         if tx_ids_list.get(i).unwrap() == tx_id {
-            storage.tx_ids_list.remove(i);
+            let _ = storage.tx_ids_list.remove(i);
             break;
         }
         i += 1;
     }
 
-    storage.txs.remove(tx_id);
-    storage.txs_calldata.remove(tx_id);
-    storage.txs_function_selector.remove(tx_id);
-    storage.approvals.remove(tx_id);
-    storage.approvals_count.remove(tx_id);
-    storage.rejections_count.remove(tx_id);
+    let _ = storage.txs.remove(tx_id);
+    let _ = storage.txs_calldata.remove(tx_id);
+    let _ = storage.txs_function_selector.remove(tx_id);
+    let _ = storage.approvals.remove(tx_id);
+    let _ = storage.approvals_count.remove(tx_id);
+    let _ = storage.rejections_count.remove(tx_id);
 
     // Emit event
     log(TransactionRemoved { tx_id: tx_id });
@@ -469,21 +469,21 @@ fn _remove_tx(tx_id: TxId) {
 #[storage(read, write)]
 fn _remove_owner(owner: Identity) {
     // Remove the owner from the mapping
-    storage.owners.remove(owner);
+    let _ = storage.owners.remove(owner);
 
     // Remove the owner from the list
     let owners_list = storage.owners_list.load_vec();
     let mut i = 0;
     while i < owners_list.len() {
         if owners_list.get(i).unwrap() == owner {
-            storage.owners_list.remove(i);
+            let _ = storage.owners_list.remove(i);
             break;
         }
         i += 1;
     }
 }
 
-#[storage(read, write)]
+#[storage(read)]
 fn _execute_tx(transaction: Transaction) {
     // Check if it is a call or a transfer and execute it.
     match transaction.tx_parameters {
@@ -601,7 +601,6 @@ fn check_if_tx_expired(tx_id: TxId) -> bool {
 fn check_if_threshold_can_be_reached(tx_id: TxId) -> bool {
     let threshold = storage.threshold.read();
     let owners_count = storage.owners_list.len();
-    let approvals_count = storage.approvals_count.get(tx_id).read();
     let rejections_count = storage.rejections_count.get(tx_id).read();
 
     // If the rejections are greater than the owners - threshold, the threshold can't be reached
