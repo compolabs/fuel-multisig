@@ -2,8 +2,6 @@ library;
 
 // Errors
 pub enum MultisigError {
-    // Generic error
-    GenericError: (),
     /// Maximum number of owners reached
     MaxOwnersReached: (),
     /// The account is already an owner
@@ -40,4 +38,6 @@ pub enum MultisigError {
     TransferRequiresAValue: (),
     /// The transaction has expired
     TransactionExpired: (),
+    /// Maximum number of transactions reached
+    MaxTransactionsReached: (),
 }

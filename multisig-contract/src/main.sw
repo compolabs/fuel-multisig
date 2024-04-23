@@ -5,7 +5,7 @@ mod types;
 mod interface;
 mod errors;
 
-use types::{MAX_OWNERS, *};
+use types::*;
 use interface::*;
 use errors::MultisigError;
 use events::*;
@@ -86,12 +86,6 @@ impl Multisig for Contract {
         // Add the owners
         let mut i = 0;
         while i < owners_count {
-            //TODO: Make this more efficient. Try insert is not working. https://github.com/FuelLabs/sway/blob/491a07fa5d298c78cf28a9a89db327cdf6fd5e69/sway-lib-std/src/storage/storage_map.sw#L180
-            //let res = storage.owners.try_insert(owners_list.get(i).unwrap(), ());
-            // If the owner is already in the list, revert
-            // if res.is_err() {
-            //     revert(0); //TODO: add custom error
-            // }
             let owner = storage.owners.get(owners_list.get(i).unwrap()).try_read();
             require(owner.is_none(), MultisigError::DuplicatedOwner);
 
@@ -117,7 +111,8 @@ impl Multisig for Contract {
         // Check that the multisig wallet has been initialized, otherwise revert
         require(storage.threshold.read() != 0, MultisigError::NotInitialized);
 
-        //TODO: Add a check to compare to MAX_TRANSACTIONS
+        // Check that the number of transactions has not reached the limit, otherwise revert
+        require(storage.tx_ids_list.len() < MAX_TRANSACTIONS.as_u64(), MultisigError::MaxTransactionsReached);
         
         // Get the caller if it is an owner. If not, revert.
         let caller = get_caller_if_owner();
@@ -128,8 +123,6 @@ impl Multisig for Contract {
 
         // Calculate the valid_until timestamp
         let valid_until = block_timestamp() + tx_validity_duration;
-
-        //TODO: Check that the tx is valid
 
         // Store the transaction
         storage.tx_ids_list.push(tx_id);
@@ -425,7 +418,6 @@ impl Info for Contract{
 
     #[storage(read)]
     fn get_tx_approval_by_owner(tx_id: TxId, owner: Identity) -> Option<bool> {
-        //TODO: this might panic if the tx_id is not valid, so we should check it
         storage.approvals.get(tx_id).get(owner).try_read()
     }
 
@@ -445,7 +437,7 @@ impl Info for Contract{
 fn _remove_tx(tx_id: TxId) {
     // Remove the transaction from active transactions
     let tx_ids_list = storage.tx_ids_list.load_vec();
-    //TODO: Find a better way to remove the tx_id from the tx_ids_list
+    
     let mut i = 0;
     while i < tx_ids_list.len() {
         if tx_ids_list.get(i).unwrap() == tx_id {
@@ -491,8 +483,8 @@ fn _execute_tx(transaction: Transaction) {
             let target_contract_id = match transaction.to {
                 Identity::ContractId(contract_identifier) => contract_identifier,
                 _ => {
-                    // TODO: Add custom error
-                    revert(0);
+                    require(false, MultisigError::CanOnlyCallContracts);
+                    revert(0); //TODO: This was added to make the compiler happy. This code is unreachable.
                 },
             };
 
@@ -516,7 +508,6 @@ fn _execute_tx(transaction: Transaction) {
             let function_selector = storage.txs_function_selector.get(transaction.tx_id).read_slice().unwrap();
             let calldata = storage.txs_calldata.get(transaction.tx_id).read_slice().unwrap();
 
-            // TODO: Check if we can analyze the result of the execution
             call_with_function_selector(
                 target_contract_id,
                 function_selector,
@@ -540,7 +531,6 @@ fn _execute_tx(transaction: Transaction) {
             );
 
             transfer(transaction.to, transfer_params.asset_id, value);
-            //TODO: emit event
         },
     }
 }
