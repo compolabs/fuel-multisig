@@ -2,11 +2,13 @@ use fuels::prelude::*;
 use fuels::types::Identity;
 
 use crate::utils::setup::{
-    call_parameters_add_owner, call_parameters_remove_owner, deploy_multisig, get_multisig_caller, get_wallets, wallets_to_identities
+    call_parameters_add_owner, call_parameters_remove_owner, deploy_multisig, get_multisig_caller,
+    get_wallets, wallets_to_identities,
 };
 
 #[tokio::test]
-async fn add_owner_works_with_threshold_of_1() {
+async fn given_a_multisig_with_one_owner_and_threshold_one_when_proposing_a_tx_it_should_be_executed_with_no_errors(
+) {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;
@@ -78,7 +80,8 @@ async fn add_owner_works_with_threshold_of_1() {
 }
 
 #[tokio::test]
-async fn add_owner_works_with_threshold_of_3() {
+async fn given_a_multisig_with_threshold_three_when_proposing_a_add_owner_and_is_approved_by_two_it_should_be_executed_with_no_errors(
+) {
     let wallets = get_wallets(4).await;
     let owners_list = wallets_to_identities(wallets[0..3].to_vec());
     let init_threshold = 3;
@@ -166,7 +169,8 @@ async fn add_owner_works_with_threshold_of_3() {
 }
 
 #[tokio::test]
-async fn add_owner_fails_with_already_owner() {
+async fn given_a_multisig_with_some_owners_when_trying_to_add_an_exisiting_owner_it_should_fail_throwing_already_owner_error(
+) {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;
@@ -249,7 +253,8 @@ async fn add_owner_fails_with_already_owner() {
 }
 
 #[tokio::test]
-async fn add_owner_fails_with_max_owners_reached() {
+async fn given_a_multisig_with_max_owners_reached_when_trying_to_add_an_owner_it_should_throw_max_owners_error(
+) {
     let wallets = get_wallets(11).await;
     let owners_list = wallets_to_identities(wallets[0..10].to_vec());
     let init_threshold = 1;
@@ -332,7 +337,8 @@ async fn add_owner_fails_with_max_owners_reached() {
 }
 
 #[tokio::test]
-async fn remove_owner_works_with_threshold_of_1() {
+async fn given_a_multisig_with_threshold_1_and_3_owners_when_trying_to_remove_one_of_them_it_should_be_removed_successfully(
+) {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;
@@ -404,7 +410,8 @@ async fn remove_owner_works_with_threshold_of_1() {
 }
 
 #[tokio::test]
-async fn remove_owner_works_with_threshold_of_3() {
+async fn given_a_multisig_with_threshold_3_and_4_owners_when_trying_to_remove_one_of_them_it_should_be_removed_successfully(
+) {
     let wallets = get_wallets(4).await;
     let owners_list = wallets_to_identities(wallets[0..4].to_vec());
     let init_threshold = 3;
@@ -492,7 +499,8 @@ async fn remove_owner_works_with_threshold_of_3() {
 }
 
 #[tokio::test]
-async fn remove_owner_fails_with_not_owner() {
+async fn given_a_multisig_with_threshold_one_and_3_owners_when_trying_to_remove_one_that_is_not_owner_it_should_throw_not_owner_error_and_revert(
+) {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;
@@ -575,7 +583,8 @@ async fn remove_owner_fails_with_not_owner() {
 }
 
 #[tokio::test]
-async fn remove_owner_fails_with_owners_cannot_be_empty() {
+async fn given_a_multisig_with_a_single_owner_when_trying_to_remove_that_owner_it_should_throw_non_empty_error_and_revert(
+) {
     let wallets = get_wallets(1).await;
     let owners_list = wallets_to_identities(wallets[0..1].to_vec());
     let init_threshold = 1;
@@ -658,7 +667,8 @@ async fn remove_owner_fails_with_owners_cannot_be_empty() {
 }
 
 #[tokio::test]
-async fn remove_owner_fails_with_threshold_can_not_be_greater_than_owners() {
+async fn given_a_multisig_with_two_owners_and_a_threshold_of_two_when_trying_to_remove_an_owner_it_should_fail_with_verbose_error_and_revert(
+) {
     let wallets = get_wallets(2).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 2;

@@ -7,7 +7,8 @@ use crate::utils::setup::{
 };
 
 #[tokio::test]
-async fn works_1_owner() {
+async fn given_a_multisig_with_two_owners_a_threshold_of_one_when_propose_to_increment_it_should_be_changed_to_the_new_value(
+) {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;
@@ -79,7 +80,8 @@ async fn works_1_owner() {
 }
 
 #[tokio::test]
-async fn works_multiple_owners() {
+async fn given_a_multisig_with_4_owners_and_a_threshold_of_3_when_trying_to_set_threshold_to_4_it_shoudl_be_changed_as_proposed(
+) {
     let wallets = get_wallets(4).await;
     let owners_list = wallets_to_identities(wallets[0..4].to_vec());
     let init_threshold = 3;
@@ -166,7 +168,7 @@ async fn works_multiple_owners() {
 }
 
 #[tokio::test]
-async fn cant_be_zero() {
+async fn given_a_multisig_when_trying_to_set_threshold_to_zero_it_should_fail_and_throw_error() {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;
@@ -249,7 +251,8 @@ async fn cant_be_zero() {
 }
 
 #[tokio::test]
-async fn greater_than_owners() {
+async fn given_a_multisig_of_2_owners_and_threshold_of_1_when_trying_to_set_threshold_to_3_it_should_fail_and_throw_error(
+) {
     let wallets = get_wallets(3).await;
     let owners_list = wallets_to_identities(wallets[0..2].to_vec());
     let init_threshold = 1;

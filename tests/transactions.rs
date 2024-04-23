@@ -1,66 +1,11 @@
 use fuels::types::Identity;
-use fuels::{prelude::*, types::ContractId};
+use fuels::prelude::*;
 
-use crate::utils::abi::*;
 use crate::utils::constants::DEFAULT_TRANSFER_AMOUNT;
 use crate::utils::setup::{
     base_asset_contract_id, call_parameters, deploy_counter, deploy_multisig, get_wallets,
     transfer_parameters, wallets_to_identities,
 };
-
-async fn get_contract_instance() -> (Multisig<WalletUnlocked>, ContractId) {
-    // Launch a local network and deploy the contract
-    let mut wallets = launch_custom_provider_and_get_wallets(
-        WalletsConfig::new(
-            Some(1),             /* Single wallet */
-            Some(1),             /* Single coin (UTXO) */
-            Some(1_000_000_000), /* Amount per coin */
-        ),
-        None,
-        None,
-    )
-    .await
-    .unwrap();
-    let wallet = wallets.pop().unwrap();
-
-    let id = Contract::load_from(
-        "../multisig-contract/out/debug/fuel-multisig.bin",
-        LoadConfiguration::default(),
-    )
-    .unwrap()
-    .deploy(&wallet, TxPolicies::default())
-    .await
-    .unwrap();
-
-    let instance = Multisig::new(id.clone(), wallet);
-
-    (instance, id.into())
-}
-
-#[tokio::test]
-async fn deploy_contract() {
-    let wallets = get_wallets(2).await;
-    let owners_list = wallets_to_identities(wallets);
-    let threshold = 2;
-
-    let (contract_instance, _id) = get_contract_instance().await;
-    let _ = contract_instance
-        .methods()
-        .constructor(threshold, owners_list.clone())
-        .call()
-        .await
-        .unwrap();
-    let contract_owners = contract_instance
-        .methods()
-        .get_owners()
-        .call()
-        .await
-        .unwrap()
-        .value;
-
-    assert_eq!(contract_owners.len() as u64, 2);
-    assert_eq!(contract_owners, owners_list);
-}
 
 #[tokio::test]
 async fn propose_call_tx() {
@@ -104,7 +49,6 @@ async fn propose_call_tx() {
         .await
         .unwrap()
         .value;
-    println!("Initial counter value: {:?}", initial_counter_value);
 
     // Get call parameters
     let transaction_parameters = call_parameters();
@@ -121,54 +65,6 @@ async fn propose_call_tx() {
         .call()
         .await
         .unwrap();
-
-    // let proposed_tx_log = response.decode_logs();
-    // println!("Proposed tx log: {:?}", proposed_tx_log);
-    println!("Proposed tx_id: {:?}", response.value);
-
-    /*
-    let active_tx_list = deployer
-        .contract
-        .methods()
-        .get_active_tx_ids()
-        .call()
-        .await
-        .unwrap()
-        .value;
-    println!("Active tx list: {:?}", active_tx_list);
-
-    let tx = deployer
-        .contract
-        .methods()
-        .get_tx(response.value)
-        .call()
-        .await
-        .unwrap()
-        .value
-        .unwrap();
-    println!("Proposed tx: {:?}", tx);
-
-    let tx_calldata = deployer
-        .contract
-        .methods()
-        .get_tx_calldata(response.value)
-        .call()
-        .await
-        .unwrap()
-        .value;
-
-    println!("Proposed tx calldata: {:?}", tx_calldata);
-
-    let tx_function_selector = deployer
-        .contract
-        .methods()
-        .get_tx_function_selector(response.value)
-        .call()
-        .await
-        .unwrap()
-        .value;
-    println!("Proposed tx function selector: {:?}", tx_function_selector);
-    */
 
     // Execute the call tx because the threshold is 1
     let response = deployer
@@ -190,7 +86,6 @@ async fn propose_call_tx() {
         .await
         .unwrap()
         .value;
-    println!("Final counter value: {:?}", final_counter_value);
 
     assert_eq!(initial_counter_value, 0);
     assert_eq!(final_counter_value, initial_counter_value + 5);
@@ -235,8 +130,6 @@ async fn propose_transfer_tx() {
         .await
         .unwrap();
 
-    println!("Initial contract balance: {:?}", initial_contract_balance);
-
     // Get transfer parameters
     let (receiver_wallet, receiver, transaction_parameters) = transfer_parameters();
 
@@ -247,7 +140,6 @@ async fn propose_transfer_tx() {
         .get_asset_balance(receiver_wallet.address(), BASE_ASSET_ID)
         .await
         .unwrap();
-    println!("Initial receiver balance: {:?}", initial_receiver_balance);
 
     // Propose a transfer tx
     let response = deployer
@@ -258,48 +150,14 @@ async fn propose_transfer_tx() {
         .await
         .unwrap();
 
-    let proposed_tx_log = response.decode_logs();
-    println!("Proposed tx log: {:?}", proposed_tx_log);
-    println!("Proposed tx_id: {:?}", response.value);
-
-    let active_tx_list = deployer
-        .contract
-        .methods()
-        .get_active_tx_ids()
-        .call()
-        .await
-        .unwrap()
-        .value;
-    println!("Active tx list: {:?}", active_tx_list);
-
-    let tx = deployer
-        .contract
-        .methods()
-        .get_tx(response.value)
-        .call()
-        .await
-        .unwrap()
-        .value
-        .unwrap();
-    println!("Proposed tx: {:?}", tx);
-
     // Execute the transfer tx because the threshold is 1
-    let response = deployer
+    let _ = deployer
         .contract
         .methods()
         .execute_tx(response.value)
         .append_variable_outputs(1)
         .call()
         .await;
-
-    match response {
-        Ok(_) => {
-            println!("Transfer tx executed successfully");
-        }
-        Err(e) => {
-            println!("Error executing transfer tx: {:?}", e);
-        }
-    }
 
     // check balances post-transfer
     let final_contract_balance = deployer
