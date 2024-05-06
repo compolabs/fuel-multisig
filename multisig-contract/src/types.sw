@@ -61,3 +61,13 @@ pub struct TransferParams {
     /// The amount to transfer.
     value: Option<u64>,
 }
+
+/// The full data of a transaction.
+pub struct TransactionData {
+    tx_id: TxId,
+    to: Identity,
+    valid_until: u64,
+    tx_parameters: TransactionParameters,
+    approvals_count: u8,
+    rejections_count: u8
+}

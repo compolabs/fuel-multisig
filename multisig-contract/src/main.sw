@@ -402,33 +402,42 @@ impl Info for Contract{
     }
 
     #[storage(read)]
-    fn get_tx(tx_id: TxId) -> Option<Transaction> {
-        storage.txs.get(tx_id).try_read()
-    }
+    fn get_tx(tx_id: TxId) -> Option<TransactionData> {
+        let tx = storage.txs.get(tx_id).try_read();
 
-    #[storage(read)]
-    fn get_tx_calldata(tx_id: TxId) -> Option<Bytes> {
-        storage.txs_calldata.get(tx_id).read_slice()
-    }
+        if let Some(tx) = tx {
+            let tx_parameters = match tx.tx_parameters {
+                InternalTransactionParameters::Call(contract_call_params) => {
+                    TransactionParameters::Call(ContractCallParams {
+                        calldata: storage.txs_calldata.get(tx_id).read_slice().unwrap(),
+                        forwarded_gas: contract_call_params.forwarded_gas,
+                        function_selector: storage.txs_function_selector.get(tx_id).read_slice().unwrap(),
+                        single_value_type_arg: contract_call_params.single_value_type_arg,
+                        transfer_params: contract_call_params.transfer_params,
+                    })
+                },
+                InternalTransactionParameters::Transfer(transfer_params) => {
+                    TransactionParameters::Transfer(transfer_params)
+                },
+            };
 
-    #[storage(read)]
-    fn get_tx_function_selector(tx_id: TxId) -> Option<Bytes> {
-        storage.txs_function_selector.get(tx_id).read_slice()
+            Some(TransactionData{
+                tx_id: tx_id,
+                to: tx.to,
+                valid_until: tx.valid_until,
+                tx_parameters: tx_parameters,
+                approvals_count: storage.approvals_count.get(tx_id).try_read().unwrap_or(0),
+                rejections_count: storage.rejections_count.get(tx_id).try_read().unwrap_or(0),
+            })
+        }
+        else {
+            return None;
+        }
     }
 
     #[storage(read)]
     fn get_tx_approval_by_owner(tx_id: TxId, owner: Identity) -> Option<bool> {
         storage.approvals.get(tx_id).get(owner).try_read()
-    }
-
-    #[storage(read)]
-    fn get_tx_approval_count(tx_id: TxId) -> Option<Approvals> {
-        storage.approvals_count.get(tx_id).try_read()
-    }
-
-    #[storage(read)]
-    fn get_tx_rejection_count(tx_id: TxId) -> Option<Rejections> {
-        storage.rejections_count.get(tx_id).try_read()
     }
 }
 
