@@ -5,6 +5,7 @@ use crate::utils::setup::{
     call_parameters_change_threshold, deploy_multisig, get_multisig_caller, get_wallets,
     wallets_to_identities,
 };
+use crate::utils::validate_error;
 
 #[tokio::test]
 async fn given_a_multisig_with_two_owners_a_threshold_of_one_when_propose_to_increment_it_should_be_changed_to_the_new_value(
@@ -228,14 +229,7 @@ async fn given_a_multisig_when_trying_to_set_threshold_to_zero_it_should_fail_an
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "ThresholdCannotBeZero");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "ThresholdCannotBeZero");
 
     // Check threshold post-call
     let threshold_after = deployer
@@ -312,14 +306,7 @@ async fn given_a_multisig_of_2_owners_and_threshold_of_1_when_trying_to_set_thre
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "ThresholdCannotBeGreaterThanOwners");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "ThresholdCannotBeGreaterThanOwners");
 
     // Check threshold post-call
     let threshold_after = deployer

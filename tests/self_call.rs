@@ -1,6 +1,7 @@
 use fuels::prelude::*;
 
 use crate::utils::setup::{deploy_multisig, get_wallets, wallets_to_identities};
+use crate::utils::validate_error;
 
 #[tokio::test]
 async fn given_a_multisig_and_a_not_owner_account_when_try_to_change_threshold_from_it_then_should_throw_unauthorized(
@@ -28,14 +29,7 @@ async fn given_a_multisig_and_a_not_owner_account_when_try_to_change_threshold_f
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "Unauthorized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "Unauthorized");
 }
 
 #[tokio::test]
@@ -69,14 +63,7 @@ async fn given_a_multisig_and_a_not_owner_account_when_try_to_add_owner_from_it_
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "Unauthorized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "Unauthorized");
 }
 
 #[tokio::test]
@@ -110,12 +97,5 @@ async fn given_a_multisig_and_a_not_owner_account_when_try_to_remove_owner_from_
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "Unauthorized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "Unauthorized");
 }

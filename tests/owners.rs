@@ -5,6 +5,7 @@ use crate::utils::setup::{
     call_parameters_add_owner, call_parameters_remove_owner, deploy_multisig, get_multisig_caller,
     get_wallets, wallets_to_identities,
 };
+use crate::utils::validate_error;
 
 #[tokio::test]
 async fn given_a_multisig_with_one_owner_and_threshold_one_when_proposing_a_tx_it_should_be_executed_with_no_errors(
@@ -230,14 +231,7 @@ async fn given_a_multisig_with_some_owners_when_trying_to_add_an_exisiting_owner
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "AlreadyOwner");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "AlreadyOwner");
 
     // Check that the owner was not added
     let new_owners = deployer
@@ -314,14 +308,7 @@ async fn given_a_multisig_with_max_owners_reached_when_trying_to_add_an_owner_it
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "MaxOwnersReached");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "MaxOwnersReached");
 
     // Check that the owner was not added
     let new_owners = deployer
@@ -560,14 +547,7 @@ async fn given_a_multisig_with_threshold_one_and_3_owners_when_trying_to_remove_
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotOwner");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotOwner");
 
     // Check that the owner was not removed
     let new_owners = deployer
@@ -644,14 +624,7 @@ async fn given_a_multisig_with_a_single_owner_when_trying_to_remove_that_owner_i
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "OwnersCannotBeEmpty");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "OwnersCannotBeEmpty");
 
     // Check that the owner was not removed
     let new_owners = deployer
@@ -741,14 +714,7 @@ async fn given_a_multisig_with_two_owners_and_a_threshold_of_two_when_trying_to_
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "ThresholdCannotBeGreaterThanOwners");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "ThresholdCannotBeGreaterThanOwners");
 
     // Check that the owner was not removed
     let new_owners = deployer

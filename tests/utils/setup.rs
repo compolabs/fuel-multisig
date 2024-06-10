@@ -2,8 +2,8 @@ use super::abi::*;
 use super::constants::{DEFAULT_FORWARDED_GAS, DEFAULT_TRANSFER_AMOUNT};
 use fuels::{
     accounts::wallet::WalletUnlocked,
-    core::codec::{calldata, fn_selector},
-    prelude::{Address, AssetId, Contract, Error, LoadConfiguration, TxPolicies, BASE_ASSET_ID},
+    core::codec::{calldata, encode_fn_selector},
+    prelude::{Address, AssetId, Contract, Error, LoadConfiguration, TxPolicies},
     test_helpers::{launch_custom_provider_and_get_wallets, WalletsConfig},
     types::{bech32::Bech32ContractId, Bytes, Identity},
 };
@@ -18,7 +18,7 @@ pub struct CounterCaller {
     pub wallet: WalletUnlocked,
 }
 pub fn base_asset_contract_id() -> AssetId {
-    AssetId::new(BASE_ASSET_ID.into())
+    AssetId::BASE
 }
 
 pub fn transfer_parameters() -> (WalletUnlocked, Identity, TransactionParameters) {
@@ -37,8 +37,7 @@ pub fn call_parameters() -> TransactionParameters {
     TransactionParameters::Call(ContractCallParams {
         calldata: Bytes(calldata!(5u64).unwrap()),
         forwarded_gas: DEFAULT_FORWARDED_GAS,
-        function_selector: Bytes(fn_selector!(increment_counter(u64))),
-        single_value_type_arg: true,
+        function_selector: Bytes(encode_fn_selector("increment_counter")),
         transfer_params: TransferParams {
             asset_id: base_asset_contract_id(),
             value: None,
@@ -50,8 +49,7 @@ pub fn call_parameters_change_threshold(threshold: u8) -> TransactionParameters 
     TransactionParameters::Call(ContractCallParams {
         calldata: Bytes(calldata!(threshold).unwrap()),
         forwarded_gas: DEFAULT_FORWARDED_GAS,
-        function_selector: Bytes(fn_selector!(change_threshold(u8))),
-        single_value_type_arg: true,
+        function_selector: Bytes(encode_fn_selector("change_threshold")),
         transfer_params: TransferParams {
             asset_id: base_asset_contract_id(),
             value: None,
@@ -63,8 +61,7 @@ pub fn call_parameters_add_owner(owner: Identity) -> TransactionParameters {
     TransactionParameters::Call(ContractCallParams {
         calldata: Bytes(calldata!(owner).unwrap()),
         forwarded_gas: DEFAULT_FORWARDED_GAS,
-        function_selector: Bytes(fn_selector!(add_owner(Identity))),
-        single_value_type_arg: false,
+        function_selector: Bytes(encode_fn_selector("add_owner")),
         transfer_params: TransferParams {
             asset_id: base_asset_contract_id(),
             value: None,
@@ -76,8 +73,7 @@ pub fn call_parameters_remove_owner(owner: Identity) -> TransactionParameters {
     TransactionParameters::Call(ContractCallParams {
         calldata: Bytes(calldata!(owner).unwrap()),
         forwarded_gas: DEFAULT_FORWARDED_GAS,
-        function_selector: Bytes(fn_selector!(remove_owner(Identity))),
-        single_value_type_arg: false,
+        function_selector: Bytes(encode_fn_selector("remove_owner")),
         transfer_params: TransferParams {
             asset_id: base_asset_contract_id(),
             value: None,

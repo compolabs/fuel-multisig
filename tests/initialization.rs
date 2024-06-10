@@ -3,6 +3,7 @@ use fuels::{prelude::*, types::U256};
 use crate::utils::setup::{
     deploy_multisig, get_wallets, transfer_parameters, wallets_to_identities,
 };
+use crate::utils::validate_error;
 
 #[tokio::test]
 async fn given_a_multisig_not_initialized_when_try_to_change_threshold_then_it_will_throw_not_initialized(
@@ -19,14 +20,7 @@ async fn given_a_multisig_not_initialized_when_try_to_change_threshold_then_it_w
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -50,14 +44,7 @@ async fn given_a_multisig_not_initialized_when_try_to_add_owner_call_then_it_wil
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -81,14 +68,7 @@ async fn given_a_multisig_not_initialized_when_try_to_remove_owner_call_then_it_
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -114,14 +94,7 @@ async fn given_a_multisig_not_initialized_when_try_to_propose_tx_then_it_will_th
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -144,14 +117,7 @@ async fn given_a_multisig_not_initialized_when_try_to_approve_tx_then_it_will_th
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -174,14 +140,7 @@ async fn given_a_multisig_not_initialized_when_try_to_reject_tx_then_it_will_thr
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -204,14 +163,7 @@ async fn given_a_multisig_not_initialized_when_try_to_execute_tx_then_it_will_th
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }
 
 #[tokio::test]
@@ -234,12 +186,5 @@ async fn given_a_multisig_not_initialized_when_try_to_remove_tx_then_it_will_thr
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotInitialized");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotInitialized");
 }

@@ -13,10 +13,10 @@ pub const MAX_TRANSACTIONS: u8 = 10;
 
 /// The transaction that is being proposed.
 pub struct Transaction {
-    tx_id: TxId,
-    to: Identity,
-    valid_until: u64,
-    tx_parameters: InternalTransactionParameters,
+    pub tx_id: TxId,
+    pub to: Identity,
+    pub valid_until: u64,
+    pub tx_parameters: InternalTransactionParameters,
 }
 
 /// Determines the type of transaction parameters.
@@ -33,41 +33,37 @@ pub enum InternalTransactionParameters {
 /// Parameters for calling a contract.
 pub struct ContractCallParams {
     /// The calldata for the call.
-    calldata: Bytes,
+    pub calldata: Bytes,
     /// The amount of gas to forward.
-    forwarded_gas: u64,
+    pub forwarded_gas: u64,
     /// The function selector for the call.
-    function_selector: Bytes,
-    /// Whether the function being called takes a single value-type argument.
-    single_value_type_arg: bool,
+    pub function_selector: Bytes,
     /// Parameters for a transfer.
-    transfer_params: TransferParams,
+    pub transfer_params: TransferParams,
 }
 
 /// Parameters for calling a contract.
 pub struct InternalContractCallParams {
     /// The amount of gas to forward.
-    forwarded_gas: u64,
-    /// Whether the function being called takes a single value-type argument.
-    single_value_type_arg: bool,
+    pub forwarded_gas: u64,
     /// Parameters for a transfer.
-    transfer_params: TransferParams,
+    pub transfer_params: TransferParams,
 }
 
 /// Parameters for a transfer.
 pub struct TransferParams {
     /// The asset to transfer.
-    asset_id: AssetId,
+    pub asset_id: AssetId,
     /// The amount to transfer.
-    value: Option<u64>,
+    pub value: Option<u64>,
 }
 
 /// The full data of a transaction.
 pub struct TransactionData {
-    tx_id: TxId,
-    to: Identity,
-    valid_until: u64,
-    tx_parameters: TransactionParameters,
-    approvals_count: u8,
-    rejections_count: u8
+    pub tx_id: TxId,
+    pub to: Identity,
+    pub valid_until: u64,
+    pub tx_parameters: TransactionParameters,
+    pub approvals_count: u8,
+    pub rejections_count: u8
 }

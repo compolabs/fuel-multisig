@@ -6,6 +6,7 @@ use crate::utils::setup::{
     base_asset_contract_id, call_parameters, deploy_counter, deploy_multisig, get_multisig_caller,
     get_wallets, transfer_parameters, wallets_to_identities,
 };
+use crate::utils::validate_error;
 
 #[tokio::test]
 async fn given_a_multisig_with_a_proposed_transaction_when_threshold_is_reached_and_the_transaction_executed_then_the_contract_is_called_as_expected(
@@ -35,7 +36,7 @@ async fn given_a_multisig_with_a_proposed_transaction_when_threshold_is_reached_
         .force_transfer_to_contract(
             deployer.contract.contract_id(),
             DEFAULT_TRANSFER_AMOUNT,
-            BASE_ASSET_ID,
+            AssetId::BASE,
             TxPolicies::default(),
         )
         .await
@@ -117,7 +118,7 @@ async fn given_a_multisig_with_a_proposed_transfer_when_threshold_is_reached_and
         .force_transfer_to_contract(
             deployer.contract.contract_id(),
             DEFAULT_TRANSFER_AMOUNT,
-            BASE_ASSET_ID,
+            AssetId::BASE,
             TxPolicies::default(),
         )
         .await
@@ -139,7 +140,7 @@ async fn given_a_multisig_with_a_proposed_transfer_when_threshold_is_reached_and
         .wallet
         .provider()
         .unwrap()
-        .get_asset_balance(receiver_wallet.address(), BASE_ASSET_ID)
+        .get_asset_balance(receiver_wallet.address(), AssetId::BASE)
         .await
         .unwrap();
 
@@ -173,7 +174,7 @@ async fn given_a_multisig_with_a_proposed_transfer_when_threshold_is_reached_and
         .wallet
         .provider()
         .unwrap()
-        .get_asset_balance(receiver_wallet.address(), BASE_ASSET_ID)
+        .get_asset_balance(receiver_wallet.address(), AssetId::BASE)
         .await
         .unwrap();
 
@@ -247,14 +248,7 @@ async fn given_a_multisig_when_try_to_propose_a_tx_then_is_possible_until_max_tx
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "MaxTransactionsReached");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "MaxTransactionsReached");
 
     // Check txs count post-call
     let txs_ids = deployer
@@ -307,14 +301,7 @@ async fn given_a_multisig_when_try_to_propose_a_tx_from_a_not_owner_account_then
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "NotOwner");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "NotOwner");
 }
 
 #[tokio::test]
@@ -352,7 +339,7 @@ async fn given_a_multisig_with_not_enough_amount_when_try_to_transfer_then_shoul
         .wallet
         .provider()
         .unwrap()
-        .get_asset_balance(receiver_wallet.address(), BASE_ASSET_ID)
+        .get_asset_balance(receiver_wallet.address(), AssetId::BASE)
         .await
         .unwrap();
 
@@ -378,14 +365,7 @@ async fn given_a_multisig_with_not_enough_amount_when_try_to_transfer_then_shoul
     assert!(response.is_err());
 
     // Check the error
-    match response.err().unwrap() {
-        Error::RevertTransactionError { reason, .. } => {
-            assert_eq!(reason, "InsufficientAssetAmount");
-        }
-        _ => {
-            unreachable!("Error should be RevertTransactionError");
-        }
-    }
+    validate_error(response, "InsufficientAssetAmount");
 
     // check balances post-transfer
     let final_contract_balance = deployer
@@ -399,7 +379,7 @@ async fn given_a_multisig_with_not_enough_amount_when_try_to_transfer_then_shoul
         .wallet
         .provider()
         .unwrap()
-        .get_asset_balance(receiver_wallet.address(), BASE_ASSET_ID)
+        .get_asset_balance(receiver_wallet.address(), AssetId::BASE)
         .await
         .unwrap();
 

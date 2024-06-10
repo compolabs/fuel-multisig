@@ -11,7 +11,6 @@ use errors::MultisigError;
 use events::*;
 use std::{
     asset::transfer,
-    call_frames::contract_id,
     context::this_balance,
     hash::Hash,
     low_level_call::{
@@ -100,7 +99,7 @@ impl Multisig for Contract {
 
         // Emit event
         log(MultisigInitialized {
-            contract_id: contract_id(),
+            contract_id: ContractId::this(),
             threshold: threshold,
             owners: owners_list,
         });
@@ -138,7 +137,6 @@ impl Multisig for Contract {
 
                 InternalTransactionParameters::Call(InternalContractCallParams {
                     forwarded_gas: contract_call_params.forwarded_gas,
-                    single_value_type_arg: contract_call_params.single_value_type_arg,
                     transfer_params: contract_call_params.transfer_params,
                 })
             },
@@ -412,7 +410,6 @@ impl Info for Contract{
                         calldata: storage.txs_calldata.get(tx_id).read_slice().unwrap(),
                         forwarded_gas: contract_call_params.forwarded_gas,
                         function_selector: storage.txs_function_selector.get(tx_id).read_slice().unwrap(),
-                        single_value_type_arg: contract_call_params.single_value_type_arg,
                         transfer_params: contract_call_params.transfer_params,
                     })
                 },
@@ -521,8 +518,6 @@ fn _execute_tx(transaction: Transaction) {
                 target_contract_id,
                 function_selector,
                 calldata,
-                contract_call_params
-                    .single_value_type_arg,
                 call_params,
             );
         },
@@ -613,7 +608,7 @@ fn check_self_call() {
     };
 
     let is_self_call = match caller {
-        Identity::ContractId(caller_contract_id) => caller_contract_id == contract_id(),
+        Identity::ContractId(caller_contract_id) => caller_contract_id == ContractId::this(),
         _ => false,
     };
     require(is_self_call, MultisigError::Unauthorized);
