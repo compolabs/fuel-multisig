@@ -61,7 +61,7 @@ async fn given_a_multisig_with_two_owners_a_threshold_of_one_when_propose_to_inc
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -149,7 +149,7 @@ async fn given_a_multisig_with_4_owners_and_a_threshold_of_3_when_trying_to_set_
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -221,7 +221,7 @@ async fn given_a_multisig_when_trying_to_set_threshold_to_zero_it_should_fail_an
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -298,7 +298,7 @@ async fn given_a_multisig_of_2_owners_and_threshold_of_1_when_trying_to_set_thre
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 

@@ -1,7 +1,7 @@
 contract;
 
 mod events;
-mod types;
+pub mod types;
 mod interface;
 mod errors;
 

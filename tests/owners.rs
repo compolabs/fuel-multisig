@@ -61,7 +61,7 @@ async fn given_a_multisig_with_one_owner_and_threshold_one_when_proposing_a_tx_i
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -150,7 +150,7 @@ async fn given_a_multisig_with_threshold_three_when_proposing_a_add_owner_and_is
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -223,7 +223,7 @@ async fn given_a_multisig_with_some_owners_when_trying_to_add_an_exisiting_owner
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -300,7 +300,7 @@ async fn given_a_multisig_with_max_owners_reached_when_trying_to_add_an_owner_it
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -377,7 +377,7 @@ async fn given_a_multisig_with_threshold_1_and_3_owners_when_trying_to_remove_on
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -466,7 +466,7 @@ async fn given_a_multisig_with_threshold_3_and_4_owners_when_trying_to_remove_on
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -539,7 +539,7 @@ async fn given_a_multisig_with_threshold_one_and_3_owners_when_trying_to_remove_
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -616,7 +616,7 @@ async fn given_a_multisig_with_a_single_owner_when_trying_to_remove_that_owner_i
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 
@@ -700,13 +700,13 @@ async fn given_a_multisig_with_two_owners_and_a_threshold_of_two_when_trying_to_
         .call()
         .await
         .unwrap();
-    
+
     // Execute the tx
     let response = deployer
         .contract
         .methods()
         .execute_tx(proposed_tx_id)
-        .append_contract(contract_id)
+        .with_contract_ids(&[contract_id.into()])
         .call()
         .await;
 

@@ -1,5 +1,5 @@
 use fuels::prelude::*;
-use fuels::types::Identity;
+use fuels::types::{ Identity, transaction_builders::VariableOutputPolicy::Exactly} ;
 
 use crate::utils::constants::DEFAULT_TRANSFER_AMOUNT;
 use crate::utils::setup::{
@@ -73,7 +73,7 @@ async fn given_a_multisig_with_a_proposed_transaction_when_threshold_is_reached_
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_contract(counter_contract_id)
+        .with_contract_ids(&[counter_contract_id.into()])
         .call()
         .await;
 
@@ -158,7 +158,7 @@ async fn given_a_multisig_with_a_proposed_transfer_when_threshold_is_reached_and
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_variable_outputs(1)
+        .with_variable_output_policy(Exactly(1))
         .call()
         .await;
 
@@ -227,7 +227,7 @@ async fn given_a_multisig_when_try_to_propose_a_tx_then_is_possible_until_max_tx
         .contract
         .methods()
         .get_active_tx_ids()
-        .simulate()
+        .simulate(Execution::Realistic)
         .await
         .unwrap()
         .value;
@@ -255,7 +255,7 @@ async fn given_a_multisig_when_try_to_propose_a_tx_then_is_possible_until_max_tx
         .contract
         .methods()
         .get_active_tx_ids()
-        .simulate()
+        .simulate(Execution::Realistic)
         .await
         .unwrap()
         .value;
@@ -357,7 +357,7 @@ async fn given_a_multisig_with_not_enough_amount_when_try_to_transfer_then_shoul
         .contract
         .methods()
         .execute_tx(response.value)
-        .append_variable_outputs(1)
+        .with_variable_output_policy(Exactly(1))
         .call()
         .await;
 

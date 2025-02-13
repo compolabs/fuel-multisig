@@ -7,7 +7,8 @@ authors = ["0xLucca <0xlucca.dev@gmail.com>"]
 license = "Apache-2.0"
 
 [dev-dependencies]
-fuels = { version = "0.63.0", features = ["fuel-core-lib"] }
+fuels = { version = "0.66.10", features = ["fuel-core-lib"] }
+#fuels = { version = "0.70.0", features = ["fuel-core-lib"] }
 tokio = { version = "1.12", features = ["rt", "macros"] }
 
 [[test]]
